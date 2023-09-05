@@ -63,7 +63,7 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
                 self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
               
                 
-                //Yenileme islemini bir fonksiyon icerisinde degil main thread icerisinde yapilmasi uyarisinda bulundugu icin yenileme islemi uygulanmak uzere main thread icerisine gonderilmektedir
+                //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
