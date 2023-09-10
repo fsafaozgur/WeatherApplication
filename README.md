@@ -1,5 +1,5 @@
 
-# WeatherApplication Uygulaması (MVVM)
+# WeatherApplication Uygulaması
 
 ## Giriş
 Proje kapsamında; kaynak olarak bir Hava Durumu API kullanılarak Türkiye'de yer alan tüm şehirlerdeki detaylı hava şartlarını kullanıcıya sunan bir Hava Durumu uygulaması MVVM tasarım kalıbı ile tasarlanmıştır. 
