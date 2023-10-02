@@ -56,20 +56,27 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         request.allHTTPHeaderFields = headers
 
         
-        
-        WebService().getWeatherDatas(request: request as URLRequest) { (weather) in
+        WebService().getWeatherDatas(request: request as URLRequest) { (weatherResult) in
             
-            if let weather = weather {
-                self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
-              
-                
-                //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-                
-                
+            switch weatherResult {
+                case .success (let weather):
+                    self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
+                    
+                    //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                    break
+                    
+                case .failure(let error):
+                    let alert = UIAlertController(title: "Error!", message: error.description, preferredStyle: UIAlertController.Style.alert)
+                    let button = UIAlertAction(title: "OK", style: UIAlertAction.Style.default)
+                    alert.addAction(button)
+                    self.present(alert, animated: true)
+                    break
             }
+            
+
         }
         
         
