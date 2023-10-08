@@ -56,15 +56,17 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         request.allHTTPHeaderFields = headers
 
         
-        WebService().getWeatherDatas(request: request as URLRequest) { (weatherResult) in
+        /*  Strong Reference Cycle durumundan kacinmak icin "weak self" ifadesini kullandik boylece Swift`e, WeatherViewController nesnesini closure icinde capture etme dedik aksi halde birbirini referans eden iki nesne oldugu icin ne closure ne de WeatherViewController nesnesi deallocate edilebilecek ve haliyle memory leak olusmasi kacinilmaz olacaktir
+        */
+        WebService().getWeatherDatas(request: request as URLRequest) { [weak self] weatherResult in
             
             switch weatherResult {
                 case .success (let weather):
-                    self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
+                    self?.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
                     
                     //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
                     DispatchQueue.main.async {
-                        self.tableView.reloadData()
+                        self?.tableView.reloadData()
                     }
                     break
                     
@@ -72,7 +74,7 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
                     let alert = UIAlertController(title: "Error!", message: error.description, preferredStyle: UIAlertController.Style.alert)
                     let button = UIAlertAction(title: "OK", style: UIAlertAction.Style.default)
                     alert.addAction(button)
-                    self.present(alert, animated: true)
+                    self?.present(alert, animated: true)
                     break
             }
             
@@ -103,7 +105,9 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         request.allHTTPHeaderFields = headers
 
         let session = URLSession.shared
-        let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+        
+        //used "weak self" to avoid Strong Reference Cycle as mentioned above
+        let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { [weak self] data, response, error -> Void in
           if (error != nil) {
             print(error?.localizedDescription)
           } else {
@@ -142,13 +146,13 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
                 
                         }
                     
-                        self.weatherTableViewModel = WeatherTableViewModel(weatherList: weatherArray)
+                        self?.weatherTableViewModel = WeatherTableViewModel(weatherList: weatherArray)
                     
 
                     
                         //Yenileme islemini bir fonksiyon icerisinde degil main thread icerisinde yapilmasi uyarisinda bulundugu icin yenileme islemi uygulanmak uzere main thread icerisine gonderilmektedir
                         DispatchQueue.main.async {
-                            self.tableView.reloadData()
+                            self?.tableView.reloadData()
                         }
 
                     }
