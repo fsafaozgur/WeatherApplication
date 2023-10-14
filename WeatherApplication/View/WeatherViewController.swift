@@ -18,7 +18,7 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     
     
-
+    var results : WeatherJSON?
     var selectedCity = "ankara"
     var weatherTableViewModel : WeatherTableViewModel?
 
@@ -31,7 +31,7 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         tableView.dataSource = self
 
         
-       fetchData()
+        fetchData()
         
     }
     
@@ -84,8 +84,48 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         
     }
         
+    
+    
+    
+    //Generic fonksiyon ile kullanim
+    func fetchDataGeneric () {
         
-      
+        
+        let headers = [
+          "content-type": "application/json",
+          "authorization": "apikey 2Wyw6ntUnM0ljtfOkuEAuX:7rekZl5MYoDe2h6fnawju4"
+        ]
+        
+        //Ucretsiz uyelik oldugu icin apikey gizlenmedi
+
+        
+        
+        let request = NSMutableURLRequest(url: NSURL(string: "https://api.collectapi.com/weather/getWeather?data.lang=tr&data.city=\(trToEng(string: selectedCity))")! as URL,cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
+        
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
+
+        
+        /*  Strong Reference Cycle durumundan kacinmak icin "weak self" ifadesini kullandik boylece Swift`e, WeatherViewController nesnesini closure icinde capture etme dedik aksi halde birbirini referans eden iki nesne oldugu icin ne closure ne de WeatherViewController nesnesi deallocate edilebilecek ve haliyle memory leak olusmasi kacinilmaz olacaktir
+        */
+        WebService().getWeatherDataGeneric(request: request as URLRequest, type: WeatherJSON.self) { [weak self] weatherResult in
+            
+            
+            if let weatherResult = weatherResult {
+                self?.weatherTableViewModel = WeatherTableViewModel(weatherList: weatherResult.result)
+                
+                //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+            }else {
+                print("DEBUG: fail to parse from JSON")
+            }
+        }
+        
+        
+    }
+    
     
     
     //WebService kullanmayarak ve haliyle decodable ViewModel kullanmayarak veriyi cekmek istesek boyle bir fonksiyon kullanabiliriz

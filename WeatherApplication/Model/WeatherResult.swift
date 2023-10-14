@@ -35,4 +35,8 @@ enum ErrorType : Error {
             return "JSON parsing process failed"
         }
     }
+    
+    
+    
+    
 }

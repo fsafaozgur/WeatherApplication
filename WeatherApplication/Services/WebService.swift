@@ -48,6 +48,50 @@ class WebService {
         }.resume()
         
     }
+    
+    
+    
+    //Generic fonksiyon
+    func getWeatherDataGeneric<T : Decodable>(request : URLRequest, type: T.Type, completition: @escaping ((T?) -> () )) {
+        
+        
+        
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            
+
+            if let error = error {
+                completition(nil)
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else{
+                completition(nil)
+                return
+            }
+            
+            guard httpResponse.statusCode == 200 else {
+                completition(nil)
+                return
+            }
+            
+            guard let data = data  else {
+                completition(nil)
+                return
+            }
+            
+            do {
+                let weather = try JSONDecoder().decode(T.self, from: data)
+                completition(weather)
+            }catch {
+                completition(nil)
+            }
+            
+                
+        }.resume()
+        
+       
+    }
+    
 }
 
 
