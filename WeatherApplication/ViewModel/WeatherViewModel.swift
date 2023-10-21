@@ -7,7 +7,74 @@
 
 import Foundation
 
+class WeatherViewModel {
+    
+    var sharedService : Service
+    var selectedCity : String
+    var weatherResult : WeatherResult
+    
+    init(service : Service, selectedCity : String) {
+        self.sharedService = service
+        self.selectedCity = selectedCity
+        self.weatherResult = WeatherResult.None
+    }
+    
+    
+    func fetchWeathers () -> WeatherResult {
+        
+        let headers = [
+          "content-type": "application/json",
+          "authorization": "apikey 2Wyw6ntUnM0ljtfOkuEAuX:7rekZl5MYoDe2h6fnawju4"
+        ]
+        
+        //Ucretsiz uyelik oldugu icin apikey gizlenmedi
 
+        
+        
+        let request = NSMutableURLRequest(url: NSURL(string: "https://api.collectapi.com/weather/getWeather?data.lang=tr&data.city=\(trToEng(string: selectedCity))")! as URL,cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
+        
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
+
+        
+        
+        /*  Strong Reference Cycle durumundan kacinmak icin closure icerisinde "weak self" ifadesini kullandik boylece Swift`e, WeatherViewController nesnesini closure icinde capture etme dedik aksi halde birbirini referans eden iki nesne oldugu icin ne closure ne de WeatherViewController nesnesi deallocate edilebilecek ve haliyle memory leak olusmasi kacinilmaz olacaktir
+        */
+        
+        //Generic fonksiyonumuz ile Decodable objemizin icini veriyle dolduruyoruz
+        sharedService.getWeatherDataGeneric(request : request as URLRequest, type: WeatherJSON.self) { [weak self] (data, error) in
+
+            
+            if error != nil {
+                self?.weatherResult = WeatherResult.failure(error!)
+            }else if let data = data{
+                self?.weatherResult = WeatherResult.success(data.result)
+            }
+        }
+        return weatherResult
+            
+    }
+    
+    func trToEng (string : String) -> String {
+        let string = string.lowercased()
+    .replacingOccurrences(of: "ı", with: "i")
+    .replacingOccurrences(of: "ğ", with: "g")
+    .replacingOccurrences(of: "ç", with: "c")
+    .replacingOccurrences(of: "ş", with: "s")
+    .replacingOccurrences(of: "ü", with: "u")
+    .replacingOccurrences(of: "ö", with: "o")
+  
+    return string
+    }
+}
+
+
+
+
+
+
+
+//TableView icin kullanacagimiz ViewModel
 struct WeatherTableViewModel {
     
     var weatherList : [Weather]
@@ -16,14 +83,15 @@ struct WeatherTableViewModel {
         return weatherList.count
     }
     
-    func cellForRowAt (index: Int) -> WeatherViewModel {
+    func cellForRowAt (index: Int) -> WeatherInfo {
 
         let weather = self.weatherList[index]
-        return WeatherViewModel(weather: weather)
+        return WeatherInfo(weather: weather)
     }
 }
-    
-    struct WeatherViewModel {
+   
+
+    struct WeatherInfo {
         
         let weather : Weather
         

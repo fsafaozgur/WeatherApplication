@@ -11,33 +11,72 @@ import UIKit
 
 class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    
 
-    
     @IBOutlet weak var tableView: UITableView!
     
-    
-    
-    var results : WeatherJSON?
-    var selectedCity = "ankara"
     var weatherTableViewModel : WeatherTableViewModel?
+    var selectedCity = "Ankara"
+    var weatherResult : WeatherResult?
 
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.delegate = self
         tableView.dataSource = self
-
         
-        fetchData()
+        let weatherViewModel = WeatherViewModel(service: FetchService(), selectedCity: self.selectedCity)
+        
+        weatherResult = weatherViewModel.fetchWeathers()
+        
+        if let weatherResult = weatherResult {
+        
+            switch weatherResult {
+                case .success (let weather):
+                    self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
+                    
+                    //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                    break
+                    
+                case .failure(let error):
+                    let alert = UIAlertController(title: "Error!", message: error.description, preferredStyle: UIAlertController.Style.alert)
+                    let button = UIAlertAction(title: "OK", style: UIAlertAction.Style.default)
+                    alert.addAction(button)
+                    self.present(alert, animated: true)
+                    break
+                
+                case .None:
+                    break
+            }
+        }
+
         
     }
     
 
     
+    
+    
+    
+    
+    
+    
+    /************************************************************************************************/
+    /************************************************************************************************/
+    /************************************************************************************************/
+    /************************************************************************************************/
+    /*
+     Bu noktadan itibaren yazilan kodlar ornek amacli yazilmistir, test edilmesi zor ve generic kodlar olmadigi icin projede kullanilmamistir
      
+    
+    
+    
+    
+    
+    
     func fetchData () {
         
         
@@ -84,51 +123,9 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         
     }
         
+  
     
-    
-    
-    //Generic fonksiyon ile kullanim
-    func fetchDataGeneric () {
-        
-        
-        let headers = [
-          "content-type": "application/json",
-          "authorization": "apikey 2Wyw6ntUnM0ljtfOkuEAuX:7rekZl5MYoDe2h6fnawju4"
-        ]
-        
-        //Ucretsiz uyelik oldugu icin apikey gizlenmedi
-
-        
-        
-        let request = NSMutableURLRequest(url: NSURL(string: "https://api.collectapi.com/weather/getWeather?data.lang=tr&data.city=\(trToEng(string: selectedCity))")! as URL,cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
-        
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-
-        
-        /*  Strong Reference Cycle durumundan kacinmak icin "weak self" ifadesini kullandik boylece Swift`e, WeatherViewController nesnesini closure icinde capture etme dedik aksi halde birbirini referans eden iki nesne oldugu icin ne closure ne de WeatherViewController nesnesi deallocate edilebilecek ve haliyle memory leak olusmasi kacinilmaz olacaktir
-        */
-        WebService().getWeatherDataGeneric(request: request as URLRequest, type: WeatherJSON.self) { [weak self] weatherResult in
-            
-            
-            if let weatherResult = weatherResult {
-                self?.weatherTableViewModel = WeatherTableViewModel(weatherList: weatherResult.result)
-                
-                //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
-            }else {
-                print("DEBUG: fail to parse from JSON")
-            }
-        }
-        
-        
-    }
-    
-    
-    
-    //WebService kullanmayarak ve haliyle decodable ViewModel kullanmayarak veriyi cekmek istesek boyle bir fonksiyon kullanabiliriz
+    //WebService kullanmayarak ve haliyle decodable Model kullanmayarak veriyi cekmek istesek boyle bir fonksiyon kullanabiliriz
     func fetchDataWithoutWebservice() {
             
         
@@ -208,7 +205,7 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     }
     
-    
+    */
     
     
     
@@ -264,7 +261,6 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
     
         
         
-    
     func trToEng (string : String) -> String {
         let string = string.lowercased()
     .replacingOccurrences(of: "ı", with: "i")

@@ -8,6 +8,15 @@
 import Foundation
 
 
+
+struct WeatherJSON : Decodable {
+    
+    var success : Bool
+    var result : [Weather]
+    var city : String
+}
+
+
 struct Weather : Decodable {
     
     let status : String
@@ -20,15 +29,8 @@ struct Weather : Decodable {
     let date : String
     let description : String
     let icon : String
-    
 }
 
-struct WeatherJSON : Decodable {
-    
-    var success : Bool
-    var result : [Weather]
-    var city : String
-      
-}
+
 
 

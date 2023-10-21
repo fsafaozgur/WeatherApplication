@@ -72,6 +72,9 @@ class ViewController : UIViewController, UITableViewDelegate, UITableViewDataSou
      return nil
     }
     
+    
+    
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         city = cityTableViewModel?.cityList[indexPath.row].name
         performSegue(withIdentifier: "toWeatherVC", sender: nil)
