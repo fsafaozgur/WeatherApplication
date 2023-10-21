@@ -9,15 +9,14 @@ import Foundation
 
 
 protocol Service {
-    func getWeatherDataGeneric<T : Decodable>(request : URLRequest, type: T.Type, completition: @escaping ((T?, ErrorType?) -> () ))
+    func getWeatherData<T : Codable>(request : URLRequest, type: T.Type, completition: @escaping ((T?, ErrorType?) -> () ))
     
 }
 
-class FetchService : Service {
+class WebService : Service {
     
 
-    func getWeatherDataGeneric<T : Decodable>(request : URLRequest, type: T.Type, completition: @escaping ((T?, ErrorType?) -> () )) {
-        
+    func getWeatherData<T : Codable>(request : URLRequest, type: T.Type, completition: @escaping ((T?, ErrorType?) -> () )) {
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             
@@ -44,10 +43,8 @@ class FetchService : Service {
             do {
                 let results = try JSONDecoder().decode(T.self, from: data)
                 completition(results, nil)
-                return
             }catch {
                 completition(nil, .invalidJSONParse)
-                return
             }
             
         }.resume()
@@ -72,7 +69,7 @@ class FetchService : Service {
  */
 
 
-class WebService {
+class FetchService {
 
     
     

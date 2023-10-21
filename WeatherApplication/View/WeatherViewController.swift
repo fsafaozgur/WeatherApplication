@@ -7,56 +7,131 @@
 
 import UIKit
 
-
-
 class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
 
     @IBOutlet weak var tableView: UITableView!
     
     var weatherTableViewModel : WeatherTableViewModel?
-    var selectedCity = "Ankara"
-    var weatherResult : WeatherResult?
-
-
+    var selectedCity : String?
+    var service : Service = WebService()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.delegate = self
         tableView.dataSource = self
+
+ 
+        let headers = [
+          "content-type": "application/json",
+          "authorization": "apikey 2Wyw6ntUnM0ljtfOkuEAuX:7rekZl5MYoDe2h6fnawju4"
+        ]
+        //Ucretsiz uyelik oldugu icin apikey gizlenmedi
+
+
+        let request = NSMutableURLRequest(url: NSURL(string: "https://api.collectapi.com/weather/getWeather?data.lang=tr&data.city=\(trToEng(string: selectedCity ?? "Ankara"))")! as URL,cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10.0)
         
-        let weatherViewModel = WeatherViewModel(service: FetchService(), selectedCity: self.selectedCity)
-        
-        weatherResult = weatherViewModel.fetchWeathers()
-        
-        if let weatherResult = weatherResult {
-        
-            switch weatherResult {
-                case .success (let weather):
-                    self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
-                    
-                    //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
-                    break
-                    
-                case .failure(let error):
-                    let alert = UIAlertController(title: "Error!", message: error.description, preferredStyle: UIAlertController.Style.alert)
-                    let button = UIAlertAction(title: "OK", style: UIAlertAction.Style.default)
-                    alert.addAction(button)
-                    self.present(alert, animated: true)
-                    break
-                
-                case .None:
-                    break
-            }
-        }
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
 
         
+        /*  Strong Reference Cycle durumundan kacinmak icin "weak self" ifadesini kullandik boylece Swift`e, WeatherViewController nesnesini closure icinde capture etme dedik aksi halde birbirini referans eden iki nesne oldugu icin ne closure ne de WeatherViewController nesnesi deallocate edilebilecek ve haliyle memory leak olusmasi kacinilmaz olacaktir
+        */
+        service.getWeatherData(request : request as URLRequest, type: WeatherJSON.self) { [weak self] (data, error) in
+
+            if error != nil {
+                let alert = UIAlertController(title: "Error!", message: error?.description, preferredStyle: UIAlertController.Style.alert)
+                let button = UIAlertAction(title: "OK", style: UIAlertAction.Style.default)
+                alert.addAction(button)
+                self?.present(alert, animated: true)
+            }else {
+            
+                if let data = data{
+                    self?.weatherTableViewModel = WeatherTableViewModel(weatherList: data.result)
+                    
+                    /*
+                     Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
+                    */
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                
+                }
+            }
+        }
+ 
     }
     
 
+    
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return weatherTableViewModel == nil ? 0 : weatherTableViewModel!.numberOfRowsInSection()
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "WCell", for: indexPath) as! WeatherCell
+        
+        let weatherCell = weatherTableViewModel?.cellForRowAt(index: indexPath.row)
+        
+        cell.cityCell.text = selectedCity
+        
+        cell.dayCell.text = weatherCell?.day
+        
+        cell.dateCell.text = weatherCell?.date
+        
+        cell.currentTempCell.text = "Anlik: \(weatherCell!.degree) °"
+        
+        cell.descriptionCell.text = weatherCell?.description
+        
+        cell.maxTempCell.text = "Maksimum: \(weatherCell!.max) °"
+        
+        
+        cell.minTempCell.text = "Minimum: \(weatherCell!.min) °"
+        
+        cell.nightTempCell.text = "Gece: \(weatherCell!.night) °"
+        
+        
+        cell.humidityCell.text = "Nem: % \(weatherCell!.humidity)"
+        
+        let urlString = weatherCell?.icon
+        
+        if let imageUrl = URL( string: urlString!) {
+        
+        
+            do {
+                let imageData = try Data(contentsOf: imageUrl)
+                cell.imageViewCell.image = UIImage(data: imageData)
+            
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        
+        
+        return cell
+    }
+    
+        
+        
+    func trToEng (string : String) -> String {
+        let string = string.lowercased()
+            .replacingOccurrences(of: "ı", with: "i")
+            .replacingOccurrences(of: "ğ", with: "g")
+            .replacingOccurrences(of: "ç", with: "c")
+            .replacingOccurrences(of: "ş", with: "s")
+            .replacingOccurrences(of: "ü", with: "u")
+            .replacingOccurrences(of: "ö", with: "o")
+  
+        return string
+    }
+    
+    
     
     
     
@@ -209,68 +284,6 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return weatherTableViewModel == nil ? 0 : weatherTableViewModel!.numberOfRowsInSection()
-    }
-    
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "WCell", for: indexPath) as! WeatherCell
-        
-        let weatherCell = weatherTableViewModel?.cellForRowAt(index: indexPath.row)
-        
-        cell.cityCell.text = selectedCity
-        
-        cell.dayCell.text = weatherCell?.day
-        
-        cell.dateCell.text = weatherCell?.date
-        
-        cell.currentTempCell.text = "Anlik: \(weatherCell!.degree) °"
-        
-        cell.descriptionCell.text = weatherCell?.description
-        
-        cell.maxTempCell.text = "Maksimum: \(weatherCell!.max) °"
-        
-        
-        cell.minTempCell.text = "Minimum: \(weatherCell!.min) °"
-        
-        cell.nightTempCell.text = "Gece: \(weatherCell!.night) °"
-        
-        
-        cell.humidityCell.text = "Nem: % \(weatherCell!.humidity)"
-        
-        let urlString = weatherCell?.icon
-        
-        if let imageUrl = URL( string: urlString!) {
-        
-        
-            do {
-                let imageData = try Data(contentsOf: imageUrl)
-                cell.imageViewCell.image = UIImage(data: imageData)
-            
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        
-        
-        return cell
-    }
-    
-        
-        
-    func trToEng (string : String) -> String {
-        let string = string.lowercased()
-    .replacingOccurrences(of: "ı", with: "i")
-    .replacingOccurrences(of: "ğ", with: "g")
-    .replacingOccurrences(of: "ç", with: "c")
-    .replacingOccurrences(of: "ş", with: "s")
-    .replacingOccurrences(of: "ü", with: "u")
-    .replacingOccurrences(of: "ö", with: "o")
-  
-    return string
-    }
+   
     
 }

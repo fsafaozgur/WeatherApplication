@@ -11,6 +11,5 @@ import Foundation
 enum WeatherResult {
     case success(_ weather : [Weather])
     case failure(_ error : ErrorType)
-    case None
 }
 

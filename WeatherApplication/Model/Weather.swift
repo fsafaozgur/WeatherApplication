@@ -9,7 +9,7 @@ import Foundation
 
 
 
-struct WeatherJSON : Decodable {
+struct WeatherJSON : Codable {
     
     var success : Bool
     var result : [Weather]
@@ -17,7 +17,7 @@ struct WeatherJSON : Decodable {
 }
 
 
-struct Weather : Decodable {
+struct Weather : Codable {
     
     let status : String
     let degree : String
