@@ -15,15 +15,24 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
     var weatherTableViewModel : WeatherTableViewModel?
     var selectedCity : String?
     var service : Service = WebService()
-    
+
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.delegate = self
         tableView.dataSource = self
+        
+        fetchDatas()
 
- 
+    }
+    
+    
+    
+    func fetchDatas () {
+        
+        
         let headers = [
           "content-type": "application/json",
           "authorization": "apikey 2Wyw6ntUnM0ljtfOkuEAuX:7rekZl5MYoDe2h6fnawju4"
@@ -55,15 +64,16 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
                      Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
                     */
                     DispatchQueue.main.async {
-                        self?.tableView.reloadData()
+                        self?.tableView.reloadData()                        
                     }
                 
                 }
             }
         }
- 
+        
+        
+        
     }
-    
 
     
     
