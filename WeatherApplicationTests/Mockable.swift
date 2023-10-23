@@ -24,6 +24,10 @@ extension Mockable {
     
     func loadFromJSON <T : Codable> (filename : String, type : T.Type, completition: @escaping ((T?, ErrorType?) -> () )){
         
+        let sem = DispatchSemaphore.init(value: 1)
+        
+        //Semophore aktif
+        defer { sem.signal()}
 
         guard let path = bundle.url(forResource: filename, withExtension: "json") else {
             completition(nil, .invalidJSONParse)
@@ -33,11 +37,15 @@ extension Mockable {
         do {
             let data = try Data(contentsOf: path)
             let result = try JSONDecoder().decode(T.self, from: data)
+            
+            //Sonuclar donene kadar bekle
+            sem.wait()
             completition(result, nil)
+            
         } catch {
             completition(nil, .invalidData)
+            
         }
-        
         
     }
 }
