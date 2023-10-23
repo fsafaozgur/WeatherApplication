@@ -18,10 +18,13 @@ protocol Mockable : AnyObject {
 
 
 extension Mockable {
+    //Testi hangi dizinde yapiyorsak onun dizin bilgisini aliyoruz
     var bundle : Bundle {
         return Bundle(for: type(of: self))
     }
     
+    
+    //Bu fonksiyon sayesinde, normalde uygulamanin internetten cektigi veriyi taklit ederek local bir JSON dosyasindan cekiyoruz
     func loadFromJSON <T : Codable> (filename : String, type : T.Type, completition: @escaping ((T?, ErrorType?) -> () )){
         
         let sem = DispatchSemaphore.init(value: 1)

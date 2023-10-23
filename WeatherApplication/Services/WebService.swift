@@ -76,7 +76,7 @@ class WebService : Service {
 /************************************************************************************************/
 /*
  Bu noktadan itibaren yazilan kodlar ornek amacli yazilmistir, test edilmesi zor ve generic kodlar olmadigi icin projede kullanilmamistir
- */
+ 
 
 
 class FetchService {
@@ -121,9 +121,9 @@ class FetchService {
     }
     
     
+   
     
-    
-}
+}*/
 
 
 
