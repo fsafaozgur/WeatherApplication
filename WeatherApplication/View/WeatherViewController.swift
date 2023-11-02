@@ -12,11 +12,11 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     @IBOutlet weak var tableView: UITableView!
     
-    var weatherTableViewModel : WeatherTableViewModel?
+    var weatherTableViewModel : WeatherTableViewModel!
     var selectedCity : String?
     var viewModel = WeatherViewModel(service: WebService())
 
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -25,11 +25,12 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         //ViewController dan gelen sehir bilgisini atiyoruz
         viewModel.selectedCity = self.selectedCity
+        
         //Verileri cekiyoruz
         viewModel.fetchDatas()
 
         //Gelen veriyi kontrol ediyoruz, hata geldiyse kullaniciya gosteriyoruz, veri basariyla geldiyse tabloyu dolduruyoruz
-        loadData()
+            loadData()
 
     }
     
@@ -56,7 +57,7 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
                 self.present(alert, animated: true)
                 break
             default:
-                print("default")
+                print("DEBUG: WeatherResult not loaded")
         }
             
     }

@@ -34,16 +34,18 @@ class WeatherViewModel {
         
         /*  Strong Reference Cycle durumundan kacinmak icin "weak self" ifadesini kullandik boylece Swift`e, WeatherViewController nesnesini closure icinde capture etme dedik aksi halde birbirini referans eden iki nesne oldugu icin ne closure ne de WeatherViewController nesnesi deallocate edilebilecek ve haliyle memory leak olusmasi kacinilmaz olacaktir
         */
+        
         sharedService.getWeatherData(request : request as URLRequest, type: WeatherJSON.self) { [weak self] (data, error) in
-                
-                if let error = error {
-                    self?.weatherResult = .failure(error)
-                }else {
-                    if let data = data{
+            
+            if let error = error {
+                self?.weatherResult = .failure(error)
+            }else {
+                if let data = data{
                         self?.weatherResult = .success(data.result)
                     }
                 }
-        }
+            }
+        
     }
     
 
