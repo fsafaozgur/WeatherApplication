@@ -25,6 +25,7 @@ class WebService : Service {
 
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             
+            
             //Semophore aktif
             defer { sem.signal()}
 

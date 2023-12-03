@@ -7,7 +7,6 @@
 
 import Foundation
 
-//Ornek amacli yazdigimiz kodda kullandik, projemizde aktif olarak kullanilmamaktadir.
 enum WeatherResult {
     case success(_ weather : [Weather])
     case failure(_ error : ErrorType)
