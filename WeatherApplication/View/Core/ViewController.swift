@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import Combine
 
 class ViewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var city : String?
-    var cities : [Cities]?
     private var cityTableViewModel : CityTableViewModel?
+    private var cancellable : Set<AnyCancellable> = []
+    var viewModel : MainViewModel = MainViewModel()
     
     @IBOutlet weak var tableView: UITableView!
      
@@ -23,56 +25,22 @@ class ViewController : UIViewController, UITableViewDelegate, UITableViewDataSou
         tableView.delegate = self
         tableView.dataSource = self
         
-        cities = fetchFromJSON(jsonName: "cities")
-        self.cityTableViewModel = CityTableViewModel(cityList: cities!)
+        viewModel.fetchFromJSON()
 
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
-    
-        
-        
-    }
-        
-    
-    func fetchFromJSON (jsonName : String) -> [Cities]? {
-        
-        if let path = Bundle.main.path(forResource: jsonName, ofType: "json")
-     {
-         do {
-             let url = URL(fileURLWithPath: path)
-             let data = try Data(contentsOf: url)
-             let jsonData = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String:Any]
-             
-     
-                if let cities = jsonData!["city"] as? [[String:String]] {
-                 
-                    var cityArray = [Cities]()
-                    
-                    for item in cities {
-                     
-                        if let name = item["name"] {
-                            let city = Cities(name: name)
-                            cityArray.append(city)
-                        }
-                    }
-                    return cityArray
+        viewModel.$cityList
+            .sink { cities in
+                
+                self.cityTableViewModel = CityTableViewModel(cityList: cities)
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
                 }
- 
-            
-            }catch {
-                 print(error.localizedDescription)
-             }
-         
-     }else {
-        print("file cannot be found ")
-      }
-      
+            }
+            .store(in: &cancellable)
         
-     return nil
+
     }
-    
-    
+        
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

@@ -10,7 +10,7 @@ import Foundation
 
 struct CityTableViewModel {
     
-    var cityList : [Cities]
+    var cityList : [City]
     
     func numberOfRowSection() -> Int {
         return cityList.count
@@ -26,7 +26,7 @@ struct CityTableViewModel {
 
 struct CityViewModel {
     
-    var city : Cities
+    var city : City
     
     var name : String {
         return city.name
