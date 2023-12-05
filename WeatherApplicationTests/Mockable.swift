@@ -18,7 +18,7 @@ protocol Mockable : AnyObject {
 
 
 extension Mockable {
-    //Testi hangi dizinde yapiyorsak onun dizin bilgisini aliyoruz
+    //Testi hangi dizinde yapiyorsak onun dizin bilgisini aliyoruz, boylelikle dizindeki JSON dosyasinin, dosya yolunu otomatik olarak almis oluyoruz
     var bundle : Bundle {
         return Bundle(for: type(of: self))
     }
@@ -26,28 +26,20 @@ extension Mockable {
     
     //Bu fonksiyon sayesinde, normalde uygulamanin internetten cektigi veriyi taklit ederek local bir JSON dosyasindan cekiyoruz
     func loadFromJSON <T : Codable> (filename : String, type : T.Type, completition: @escaping ((T?, ErrorType?) -> () )){
-        
-        let sem = DispatchSemaphore.init(value: 1)
-        
-        //Semophore aktif
-        defer { sem.signal()}
+
 
         guard let path = bundle.url(forResource: filename, withExtension: "json") else {
-            completition(nil, .invalidJSONParse)
+            completition(nil, .invalidData)
             return
         }
         
         do {
             let data = try Data(contentsOf: path)
             let result = try JSONDecoder().decode(T.self, from: data)
-            
-            //Sonuclar donene kadar bekle
-            sem.wait()
             completition(result, nil)
             
         } catch {
-            completition(nil, .invalidData)
-            
+            completition(nil, .invalidJSONParse)
         }
         
     }

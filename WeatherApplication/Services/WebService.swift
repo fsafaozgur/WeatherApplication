@@ -19,15 +19,8 @@ class WebService : Service {
     func getWeatherData<T : Codable>(request : URLRequest, type: T.Type, completition: @escaping ((T?, ErrorType?) -> () )) {
         
 
-        //Test ederken asenkron calisma sorun verdigi icin mecburen Semophore kullanarak verinin gelmesini beklemek durumunda kalindi, test seneryosu olmasaydi asenkron calisma ile veri cekilecek ve uygulamada kisa sureli de olsa donma olmayacakti
-        //Temel sorun internetten cekilen verilerin WeatherViewController uzerinden cekilmeyerek, bir WeatherViewModel olusturarak bunun fetchDatas fonksiyonu kullanilarak cekilmesidir, testable kod yazmak icin bu sekilde tasarlamak durumunda kalindi, yoksa donmaya sebep olan Semophore kullanilmayacakti
-        let sem = DispatchSemaphore.init(value: 0)
-
         URLSession.shared.dataTask(with: request) { (data, response, error) in
-            
-            
-            //Semophore aktif
-            defer { sem.signal()}
+
 
             if let error = error {
                 completition(nil, .someError(error : error))
@@ -59,9 +52,7 @@ class WebService : Service {
             }
 
         }.resume()
-        
-        //Sonuclar donene kadar bekle
-        sem.wait()
+
     }
 }
 

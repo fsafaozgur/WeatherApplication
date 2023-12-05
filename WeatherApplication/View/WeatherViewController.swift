@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -15,6 +16,7 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
     var weatherTableViewModel : WeatherTableViewModel!
     var selectedCity : String?
     var viewModel = WeatherViewModel(service: WebService())
+    private var cancellable : Set<AnyCancellable> = []
 
 
     override func viewDidLoad() {
@@ -23,43 +25,42 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         tableView.delegate = self
         tableView.dataSource = self
         
-        //ViewController dan gelen sehir bilgisini atiyoruz
-        viewModel.selectedCity = self.selectedCity
-        
-        //Verileri cekiyoruz
-        viewModel.fetchDatas()
-
-        //Gelen veriyi kontrol ediyoruz, hata geldiyse kullaniciya gosteriyoruz, veri basariyla geldiyse tabloyu dolduruyoruz
-            loadData()
-
+        loadData()
     }
     
 
     
     
-    
+
     func loadData () {
 
-        switch viewModel.weatherResult {
-            case .success (let weather):
-                weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
-                
-                //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
+        //Verileri cekiyoruz
+        viewModel.fetchDatas(city: selectedCity ?? "Ankara")
+        
+        viewModel.$weatherResult
+            .sink { result in
+                switch result {
+                    case .success (let weather):
+                        self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
+                        
+                        //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                        break
+                        
+                    case .failure(let error):
+                        let alert = UIAlertController(title: "Error!", message: error.description, preferredStyle: UIAlertController.Style.alert)
+                        let button = UIAlertAction(title: "OK", style: UIAlertAction.Style.default)
+                        alert.addAction(button)
+                        self.present(alert, animated: true)
+                        break
+                    default:
+                        print("DEBUG: WeatherResult not loaded")
                 }
-                break
-                
-            case .failure(let error):
-                let alert = UIAlertController(title: "Error!", message: error.description, preferredStyle: UIAlertController.Style.alert)
-                let button = UIAlertAction(title: "OK", style: UIAlertAction.Style.default)
-                alert.addAction(button)
-                self.present(alert, animated: true)
-                break
-            default:
-                print("DEBUG: WeatherResult not loaded")
-        }
-            
+            }
+            .store(in: &cancellable)
+
     }
 
 

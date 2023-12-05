@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import WeatherApplication
+import Combine
 
 
 
@@ -14,35 +15,43 @@ class WeatherViewModelTest: XCTestCase {
     
     var viewModel : WeatherViewModel!
     var testWeather : [Weather]?
+    private var cancellable : Set<AnyCancellable>!
 
     
     override func setUp() {
         super.setUp()
         //Mock nesnemiz ile normalde web uzerinden gelen veriyi taklit ediyoruz, bunu yaparken MockWeather.json dosyasini kullaniyoruz
         viewModel = WeatherViewModel(service: MockWebService())
+        cancellable = []
     }
     
 
     override func tearDown() {
         super.tearDown()
+        viewModel = nil
+        cancellable = []
     }
 
     func testFetchDatasSuccessfully() throws {
     
+        
+        let expectation = XCTestExpectation(description: "fetching datas")
+        
         //Verileri WeatherViewModel turunden objemizin fetchDatas() fonksiyonu ile cekiyoruz
-        self.viewModel.fetchDatas()
+        self.viewModel.fetchDatas(city: "AnyCity")
         
-        switch viewModel.weatherResult {
-            case .success (let weather):
-                self.testWeather = weather
-                break
-            default:
-                testWeather = []
-        }
+        viewModel.$testObject
+            .sink { values in
+                
+                //Cities.json dosyasinda yer alan 2 adet verinin gelip gelmedigini kontrol ediyoruz 
+                XCTAssertEqual(values?.count, 2)
+                expectation.fulfill()
+            }
+            .store(in: &cancellable)
         
-       
-        //MockWeather.json dosyamizi okumamiz sonucunda, 2 adet veri donecegi icin bunu test ediyoruz
-        XCTAssertEqual(self.testWeather?.count, 2)
+        //expectation ile verinin gelmesi icin bir zamanasimi koyuyoruz
+        wait(for: [expectation], timeout: 2)
+
         
     }
     
