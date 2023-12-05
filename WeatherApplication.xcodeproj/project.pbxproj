@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0627D2742AE3DCFC0051175A /* ErrorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0627D2732AE3DCFC0051175A /* ErrorType.swift */; };
 		0653934F2AA46D5800F097A7 /* cities.json in Resources */ = {isa = PBXBuildFile; fileRef = 0653934E2AA46D5800F097A7 /* cities.json */; };
-		065393552AA4B21200F097A7 /* CityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 065393542AA4B21200F097A7 /* CityViewModel.swift */; };
+		065393552AA4B21200F097A7 /* CityTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 065393542AA4B21200F097A7 /* CityTableViewModel.swift */; };
 		0654EC282AE508EF00997FBA /* Mockable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0654EC272AE508EF00997FBA /* Mockable.swift */; };
 		0654EC322AE5119A00997FBA /* Mockable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0654EC272AE508EF00997FBA /* Mockable.swift */; };
 		0654EC602AE5243800997FBA /* MockWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0654EC5F2AE5243800997FBA /* MockWebService.swift */; };
@@ -47,7 +47,7 @@
 /* Begin PBXFileReference section */
 		0627D2732AE3DCFC0051175A /* ErrorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorType.swift; sourceTree = "<group>"; };
 		0653934E2AA46D5800F097A7 /* cities.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = cities.json; sourceTree = "<group>"; };
-		065393542AA4B21200F097A7 /* CityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityViewModel.swift; sourceTree = "<group>"; };
+		065393542AA4B21200F097A7 /* CityTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityTableViewModel.swift; sourceTree = "<group>"; };
 		0654EC132AE506E500997FBA /* WeatherApplicationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeatherApplicationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0654EC172AE506E500997FBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0654EC272AE508EF00997FBA /* Mockable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mockable.swift; sourceTree = "<group>"; };
@@ -191,7 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				06D9052C2B1F60360044C34F /* MainViewModel.swift */,
-				065393542AA4B21200F097A7 /* CityViewModel.swift */,
+				065393542AA4B21200F097A7 /* CityTableViewModel.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -326,7 +326,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				06C5F73D2AA1DAAD00880886 /* ViewController.swift in Sources */,
-				065393552AA4B21200F097A7 /* CityViewModel.swift in Sources */,
+				065393552AA4B21200F097A7 /* CityTableViewModel.swift in Sources */,
 				06C5F7582AA1DC5C00880886 /* WeatherViewModel.swift in Sources */,
 				06C5F7392AA1DAAD00880886 /* AppDelegate.swift in Sources */,
 				0654EC322AE5119A00997FBA /* Mockable.swift in Sources */,

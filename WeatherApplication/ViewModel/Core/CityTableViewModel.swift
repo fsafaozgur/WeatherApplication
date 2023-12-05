@@ -1,5 +1,5 @@
 //
-//  CityViewModel.swift
+//  CityTableViewModel.swift
 //  WeatherApplication
 //
 //  Created by Safa on 3.09.2023.

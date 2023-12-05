@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MainViewModel : ObservableObject{
+class MainViewModel : ObservableObject {
     
     @Published var cityList : [City] = []
 
