@@ -20,7 +20,7 @@ protocol EndPointProtocol {
 
 enum EndPoint {
     case getWeathers(city : String)
-    case getSalahs //birden cok endpoint kullanimi icin ornek olarak ekledik
+    case getSalahs //added as an example for multi usage of endpoint
 }
 
 enum Method : String {
@@ -72,6 +72,7 @@ extension EndPoint : EndPointProtocol {
     }
 
   
+    //combine all datas to create URL request 
     func request() -> URLRequest {
         
 

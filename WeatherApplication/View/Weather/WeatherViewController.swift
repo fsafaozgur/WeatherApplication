@@ -34,16 +34,17 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     func loadData () {
 
-        //Verileri cekiyoruz
+        //load result
         viewModel.fetchDatas(city: selectedCity ?? "Ankara")
         
+        //controll result when loading completed
         viewModel.$weatherResult
             .sink { result in
                 switch result {
                     case .success (let weather):
                         self.weatherTableViewModel = WeatherTableViewModel(weatherList: weather)
                         
-                        //Internetten gelen veriler pekcok faktor sebebiyle gecikmeli gelebilecegi icin biz veriler geldikten sonra asenkron olarak calisarak tabloyu yenilemesi icin yenileme kodlarini main thread icerisine gonderiyoruz
+                        //send UI processes to the main thread
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                         }

@@ -25,13 +25,17 @@ class ViewController : UIViewController, UITableViewDelegate, UITableViewDataSou
         tableView.delegate = self
         tableView.dataSource = self
         
+        //load datas
         viewModel.fetchFromJSON()
 
+        //wait until the end of loading using Combine
         viewModel.$cityList
             .sink { cities in
                 
+                //pass datas to TableView
                 self.cityTableViewModel = CityTableViewModel(cityList: cities)
                 
+                //send UI processes to the main thread
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }

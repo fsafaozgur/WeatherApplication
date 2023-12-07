@@ -9,8 +9,7 @@ import Foundation
 @testable import WeatherApplication
 
 
-//Her testimizde ayri bir JSON file kullanabilecegimiz icin genel bir protokol tanimlayip testlerimizi bu property ve fonksiyonlar ile yurutecegiz
-
+//We can use different JSON files in all test scenarios so created a protocol
 protocol Mockable : AnyObject {
     var bundle : Bundle {get}
     func loadFromJSON <T : Codable> (filename : String, type : T.Type, completition: @escaping ((T?, ErrorType?) -> () ))
@@ -18,13 +17,14 @@ protocol Mockable : AnyObject {
 
 
 extension Mockable {
-    //Testi hangi dizinde yapiyorsak onun dizin bilgisini aliyoruz, boylelikle dizindeki JSON dosyasinin, dosya yolunu otomatik olarak almis oluyoruz
+    
+    //automatically get the directory of JSON file that being used for test
     var bundle : Bundle {
         return Bundle(for: type(of: self))
     }
+
     
-    
-    //Bu fonksiyon sayesinde, normalde uygulamanin internetten cektigi veriyi taklit ederek local bir JSON dosyasindan cekiyoruz
+    //using local JSON file for pretending datas that normally being fetched from web
     func loadFromJSON <T : Codable> (filename : String, type : T.Type, completition: @escaping ((T?, ErrorType?) -> () )){
 
 

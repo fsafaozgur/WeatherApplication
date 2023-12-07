@@ -20,7 +20,8 @@ class WeatherViewModelTest: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        //Mock nesnemiz ile normalde web uzerinden gelen veriyi taklit ediyoruz, bunu yaparken MockWeather.json dosyasini kullaniyoruz
+        
+        //using MockWebService object instead of WebService object to load data locally for pretending datas that normally being fetched from web
         viewModel = WeatherViewModel(service: MockWebService())
         cancellable = []
     }
@@ -37,19 +38,21 @@ class WeatherViewModelTest: XCTestCase {
         
         let expectation = XCTestExpectation(description: "fetching datas")
         
-        //Verileri WeatherViewModel turunden objemizin fetchDatas() fonksiyonu ile cekiyoruz
+        //load datas
         self.viewModel.fetchDatas(city: "AnyCity")
         
+        //wait until the end of loading using Combine
         viewModel.$testObject
             .sink { values in
                 
-                //Cities.json dosyasinda yer alan 2 adet verinin gelip gelmedigini kontrol ediyoruz 
+                //testing whether two datas in Cities.json being received or not
                 XCTAssertEqual(values?.count, 2)
+                //mark the expectation as fulfilled
                 expectation.fulfill()
             }
             .store(in: &cancellable)
         
-        //expectation ile verinin gelmesi icin bir zamanasimi koyuyoruz
+        //In case of not being fulfilled, add a timeout to expectation
         wait(for: [expectation], timeout: 2)
 
         
@@ -58,7 +61,7 @@ class WeatherViewModelTest: XCTestCase {
     func testTrToEngSuccessfully() throws {
     
 
-        //Fonksiyonumuzun Turkce karakterleri Ingilizce karakterlere basariyla cevirdigini kontrol ediyoruz
+        //testing that translating characters from Turkish to English successfully
         XCTAssertEqual(self.viewModel.trToEng(string: "Gümüşhane"), "gumushane")
         
     }

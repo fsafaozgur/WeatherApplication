@@ -8,8 +8,6 @@
 import Foundation
 
 
-
-//TableView icin kullanacagimiz ViewModel
 struct WeatherTableViewModel {
     
     var weatherList : [Weather]
