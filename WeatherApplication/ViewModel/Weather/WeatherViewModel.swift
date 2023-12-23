@@ -35,8 +35,11 @@ class WeatherViewModel : ObservableObject {
                 if let data = data{
                     self?.weatherResult = .success(data.result)
                     self?.testObject = data.result
+                        
                 }
             }
+            
+            
         }
         
     }

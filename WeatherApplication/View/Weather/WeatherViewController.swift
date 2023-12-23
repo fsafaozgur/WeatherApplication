@@ -27,11 +27,8 @@ class WeatherViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         loadData()
     }
-    
 
     
-    
-
     func loadData () {
 
         //load result

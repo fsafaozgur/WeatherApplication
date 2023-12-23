@@ -11,9 +11,9 @@ import Foundation
 
 struct WeatherJSON : Codable {
     
-    var success : Bool
-    var result : [Weather]
-    var city : String
+    let success : Bool
+    let result : [Weather]
+    let city : String
 }
 
 
